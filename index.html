@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Exam Preparation Agent</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+header {
+    background: #243b70;
+    color: white;
+    padding: 22px;
+    text-align: center;
+}
+
+header p {
+    margin-top: 8px;
+}
+
+.container {
+    display: flex;
+    min-height: 90vh;
+}
+
+aside {
+    width: 230px;
+    background: #172554;
+    padding: 20px;
+}
+
+aside h3 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+aside button {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    margin: 8px 0;
+    background: #334b80;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+}
+
+aside button:hover {
+    background: #526fae;
+}
+
+main {
+    flex: 1;
+    padding: 30px;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+h1 {
+    color: #243b70;
+    margin-bottom: 15px;
+}
+
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    flex: 1;
+    min-width: 180px;
+    box-shadow: 0 2px 8px #0002;
+}
+
+.card h3 {
+    color: #3155a0;
+    margin-bottom: 10px;
+}
+
+input, textarea, select {
+    padding: 12px;
+    margin: 12px 0;
+    width: 100%;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+main button {
+    background: #3155a0;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 8px 0;
+}
+
+main button:hover {
+    background: #172554;
+}
+
+.result {
+    background: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.question-box {
+    background: white;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+}
+
+label {
+    display: block;
+    margin: 10px 0;
+}
+
+.quiz-option {
+    width: auto;
+    margin-right: 8px;
+}
+
+footer {
+    background: #172554;
+    color: white;
+    text-align: center;
+    padding: 15px;
+}
+
+@media(max-width:650px) {
+    .container {
+        flex-direction: column;
+    }
+
+    aside {
+        width: 100%;
+    }
+
+    aside button {
+        display: inline-block;
+        width: 48%;
+    }
+
+    main {
+        padding: 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>🎓 AI Exam Preparation Agent</h2>
+    <p>Your Smart Study Partner</p>
+</header>
+
+<div class="container">
+
+<aside>
+    <h3>MAIN MENU</h3>
+    <button onclick="showPage('dashboard')">🏠 Dashboard</button>
+    <button onclick="showPage('upload')">📂 Upload Materials</button>
+    <button onclick="showPage('notes')">📝 AI Notes</button>
+    <button onclick="showPage('questions')">📚 Important Questions</button>
+    <button onclick="showPage('quiz')">❓ MCQ Practice</button>
+    <button onclick="showPage('doubt')">🤖 Ask AI</button>
+</aside>
+
+<main>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="section active">
+    <h1>Welcome, Student!</h1>
+    <p>Prepare smarter and get ready for your examinations.</p>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Study Materials</h3>
+            <p id="fileCount">0 files uploaded</p>
+        </div>
+
+        <div class="card">
+            <h3>AI Notes</h3>
+            <p>Generate quick revision notes.</p>
+        </div>
+
+        <div class="card">
+            <h3>MCQ Practice</h3>
+            <p>Test your knowledge.</p>
+        </div>
+
+        <div class="card">
+            <h3>Exam Preparation</h3>
+            <p>Study and improve your performance.</p>
+        </div>
+    </div>
+</section>
+
+<!-- UPLOAD -->
+<section id="upload" class="section">
+    <h1>Upload Study Material</h1>
+    <p>Upload a TXT file containing your study material.</p>
+
+    <input type="file" id="file" accept=".txt">
+
+    <button onclick="uploadFile()">Upload Material</button>
+
+    <div id="uploadResult" class="result">
+        No material uploaded yet.
+    </div>
+</section>
+
+<!-- NOTES -->
+<section id="notes" class="section">
+    <h1>AI Notes Generator</h1>
+    <p>Generate quick notes from your uploaded content.</p>
+
+    <button onclick="generateNotes()">Generate Notes</button>
+
+    <div id="notesResult" class="result">
+        Your notes will appear here.
+    </div>
+</section>
+
+<!-- QUESTIONS -->
+<section id="questions" class="section">
+    <h1>Important Questions Generator</h1>
+
+    <label>Select Question Type:</label>
+
+    <select id="markType">
+        <option value="2">2 Marks</option>
+        <option value="5">5 Marks</option>
+        <option value="10">10 Marks</option>
+    </select>
+
+    <button onclick="generateQuestions()">Generate Questions</button>
+
+    <div id="questionResult" class="result">
+        Important questions will appear here.
+    </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" class="section">
+    <h1>MCQ Practice</h1>
+
+    <button onclick="startQuiz()">Start Quiz</button>
+
+    <div id="quizResult" class="result">
+        Your quiz will appear here.
+    </div>
+</section>
+
+<!-- AI DOUBT -->
+<section id="doubt" class="section">
+    <h1>AI Study Assistant</h1>
+
+    <textarea id="question"
+    placeholder="Ask your study question here..."></textarea>
+
+    <button onclick="askAI()">Ask Question</button>
+
+    <div id="answer" class="result">
+        AI answers will appear here.
+    </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+    <p>AI Exam Preparation Agent | CSE Mini Project</p>
+</footer>
+
+<script>
+
+// GLOBAL STUDY MATERIAL
+let studyText = "";
+let fileCount = 0;
+
+// NAVIGATION
+function showPage(id) {
+    document.querySelectorAll(".section").forEach(section => {
+        section.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+}
+
+// FILE UPLOAD
+function uploadFile() {
+    const file = document.getElementById("file").files[0];
+
+    if (!file) {
+        alert("Please select a TXT file!");
+        return;
+    }
+
+    if (!file.name.toLowerCase().endsWith(".txt")) {
+        alert("Please upload a TXT file in this demo.");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        studyText = e.target.result;
+
+        if (!studyText.trim()) {
+            alert("The file is empty!");
+            return;
+        }
+
+        fileCount++;
+
+        document.getElementById("fileCount").textContent =
+            fileCount + " file(s) uploaded";
+
+        document.getElementById("uploadResult").textContent =
+            "Material uploaded successfully!\n" +
+            "File: " + file.name;
+    };
+
+    reader.readAsText(file);
+}
+
+// SPLIT TEXT INTO SENTENCES
+function getSentences() {
+    return studyText.split(/[.!?\n]+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 20);
+}
+
+// NOTES GENERATOR
+function generateNotes() {
+    if (!studyText) {
+        alert("Upload study material first!");
+        return;
+    }
+
+    const sentences = getSentences();
+
+    const notes = sentences.slice(0, 10)
+        .map((s, i) => (i + 1) + ". " + s)
+        .join("\n\n");
+
+    document.getElementById("notesResult").textContent =
+        notes || "No readable notes found.";
+}
+
+// IMPORTANT QUESTIONS
+function generateQuestions() {
+    if (!studyText) {
+        alert("Upload study material first!");
+        return;
+    }
+
+    const marks = document.getElementById("markType").value;
+    const sentences = getSentences();
+
+    let output = "";
+
+    sentences.slice(0, 8).forEach((s, i) => {
+        output += "Q" + (i + 1) + ". " +
+            (marks == 2 ? "Define / State: " :
+            marks == 5 ? "Explain: " :
+            "Discuss in detail: ") +
+            s + "\n\n";
+    });
+
+    document.getElementById("questionResult").textContent =
+        output || "No questions available.";
+}
+
+// MCQ PRACTICE
+function startQuiz() {
+    if (!studyText) {
+        alert("Upload study material first!");
+        return;
+    }
+
+    const sentences = getSentences().slice(0, 5);
+
+    if (!sentences.length) {
+        alert("Not enough study material for a quiz.");
+        return;
+    }
+
+    let score = 0;
+    const result = document.getElementById("quizResult");
+    result.innerHTML = "";
+
+    sentences.forEach((sentence, i) => {
+        const box = document.createElement("div");
+        box.className = "question-box";
+
+        const title = document.createElement("h3");
+        title.textContent = "Q" + (i + 1) +
+            ". Which statement matches the study material?";
+        box.appendChild(title);
+
+        const options = [
+            sentence,
+            "None of these",
+            "All statements are incorrect",
+            "Not mentioned in the material"
+        ];
+
+        options.forEach((option, j) => {
+            const label = document.createElement("label");
+            const radio = document.createElement("input");
+
+            radio.type = "radio";
+            radio.name = "question" + i;
+            radio.value = j;
+            radio.className = "quiz-option";
+
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(option));
+            box.appendChild(label);
+        });
+
+        result.appendChild(box);
+    });
+
+    const submit = document.createElement("button");
+    submit.textContent = "Submit Quiz";
+
+    submit.onclick = function() {
+        score = 0;
+
+        sentences.forEach((s, i) => {
+            const selected = document.querySelector(
+                'input[name="question' + i + '"]:checked'
+            );
+
+            if (selected && Number(selected.value) === 0) {
+                score++;
+            }
+        });
+
+        const oldScore = document.getElementById("score");
+        if (oldScore) oldScore.remove();
+
+        const scoreText = document.createElement("h2");
+        scoreText.id = "score";
+        scoreText.textContent =
+            "Your Score: " + score + "/" + sentences.length;
+
+        result.appendChild(scoreText);
+        submit.disabled = true;
+    };
+
+    result.appendChild(submit);
+}
+
+// DOUBT SOLVER DEMO
+function askAI() {
+    const question = document.getElementById("question")
+        .value.trim().toLowerCase();
+
+    const answerBox = document.getElementById("answer");
+
+    if (!question) {
+        alert("Enter your question!");
+        return;
+    }
+
+    if (!studyText) {
+        answerBox.textContent =
+            "Please upload study material first.";
+        return;
+    }
+
+    const words = question.match(/\b[a-z0-9]+\b/g) || [];
+
+    const sentences = getSentences();
+
+    let matches = sentences.map(sentence => {
+        const text = sentence.toLowerCase();
+        const score = words.filter(word =>
+            word.length > 2 && text.includes(word)
+        ).length;
+
+        return {sentence, score};
+    }).filter(item => item.score > 0);
+
+    matches.sort((a, b) => b.score - a.score);
+
+    if (matches.length) {
+        answerBox.textContent =
+            "Answer based on your study material:\n\n" +
+            matches.slice(0, 3)
+            .map(item => item.sentence).join("\n\n");
+    } else {
+        answerBox.textContent =
+            "No matching information found in your uploaded material.";
+    }
+}
+
+</script>
+
+</body>
+</html>
